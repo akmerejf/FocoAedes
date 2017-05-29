@@ -1,17 +1,13 @@
 package com.example.savio.focoaedes;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.Manifest;
 
 import com.example.savio.focoaedes.model.Endereco;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,7 +27,6 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
 
     Endereco endereco;
     GoogleMap mMap;
-    Location location;
     LocationManager locationManager;
     float zoom;
 
@@ -87,33 +82,12 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
 
+        //noinspection MissingPermission
+        mMap.setMyLocationEnabled(true);
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(14.f));
+
         //configurações do botões nativos da google
         mMap.getUiSettings().setMapToolbarEnabled(false);
-
-        //Permissão para acessar sua localização
-        if (ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-
-        }
-
-        //config para capturar o melhor provider da sua localização
-        Criteria criteria = new Criteria();
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        String provider = locationManager.getBestProvider(criteria, true);
-
-        location = locationManager.getLastKnownLocation(provider);
-
-        //se o gps tiver desativado
-        if (location != null) {
-
-            //bucas e aproxima sua localização
-            mMap.setMyLocationEnabled(true);
-            LatLng meulocal = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(meulocal, 14.5f));
-        }
 
         try { geoLocaliza(); } catch (IOException e) { e.printStackTrace(); }
 
@@ -132,6 +106,7 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
 
 //---------------Metodos do Location Listener-------------------------------------------------------//
 
+
     @Override
     public void onLocationChanged(Location location) {
 
@@ -139,7 +114,7 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
         LatLng meulocal = new LatLng(location.getLatitude(), location.getLongitude());
 
         zoom = mMap.getCameraPosition().zoom;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(meulocal,zoom)); //move a camera e da zoom
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(meulocal,zoom));
     }
 
     @Override

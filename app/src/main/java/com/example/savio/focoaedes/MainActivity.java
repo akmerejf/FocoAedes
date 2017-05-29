@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     FragmentManager fragmentManager;
     FloatingActionButton fab, fab_nova_correncia, fab_info;
     Animation fab_open, fab_close, fab_rotate, fab_back_rotate;
+
     boolean aberto = false;
 
     @Override
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(aberto){
+                if (aberto) {
                     fab.startAnimation(fab_back_rotate);
                     fab_nova_correncia.startAnimation(fab_close);
                     fab_nova_correncia.setClickable(false);
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                     fab_info.setClickable(false);
                     aberto = false;
 
-                }else{
+                } else {
 
                     fab.startAnimation(fab_rotate);
                     fab_nova_correncia.startAnimation(fab_open);
@@ -65,25 +66,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        fab_nova_correncia.setOnClickListener(new View.OnClickListener(){
+        fab_nova_correncia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-            //Inicia Fragment da nova ocorrencia
-            alterarFragment(new Nova_OcorrenciaFragment(), "NovaOcorrenciaFragment");
+                //Inicia Fragment da nova ocorrencia
+                alterarFragment(new Nova_OcorrenciaFragment(), "NovaOcorrenciaFragment");
             }
         });
 
-        fab_info.setOnClickListener(new View.OnClickListener(){
+        fab_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-            Toast.makeText(MainActivity.this,"Informações", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Informações", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-//--------------Chame o metodo que inicia o fragment------------------------------------------------//
 
 
         //Inicia Fragment do mapa
