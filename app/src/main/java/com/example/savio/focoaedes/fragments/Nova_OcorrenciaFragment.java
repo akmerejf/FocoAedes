@@ -2,6 +2,7 @@ package com.example.savio.focoaedes.fragments;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -16,20 +17,30 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.savio.focoaedes.MainActivity;
 import com.example.savio.focoaedes.R;
+import com.example.savio.focoaedes.base.BaseLocal;
+import com.example.savio.focoaedes.base.Service;
 import com.example.savio.focoaedes.mascaras.MaskTelefone;
-import com.example.savio.focoaedes.model.Endereco;
+import com.example.savio.focoaedes.model.Ocorrencia;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Nova_OcorrenciaFragment extends Fragment {
 
     MaskTelefone maskTelefone;
+    BaseLocal baseLocal;
 
     View view;
     EditText titulo, bairro, rua, telefone, email, descricao;
@@ -40,6 +51,9 @@ public class Nova_OcorrenciaFragment extends Fragment {
     final int   CROP_PIC = 2;
     private Uri pic_uri;
 
+    SimpleDateFormat formato;
+    String data = "";
+
     public Nova_OcorrenciaFragment() { /*Required empty public constructor*/ }
 
     @Override
@@ -47,12 +61,16 @@ public class Nova_OcorrenciaFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_nova_ocorrencia, container, false);
 
+        baseLocal = new BaseLocal(getContext());
+        formato = new SimpleDateFormat("dd/MM/yyyy");
+
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         cancelar = (ImageView) view.findViewById(R.id.nova_cancelar);
         salvar = (TextView) view.findViewById(R.id.nova_salvar);
 
         foto = (ImageView) view.findViewById(R.id.nova_foto);
         titulo = (EditText) view.findViewById(R.id.nova_titulo);
+        data = formato.format(new Date());
         bairro = (EditText) view.findViewById(R.id.nova_bairro);
         rua = (EditText) view.findViewById(R.id.nova_endereco);
         telefone = (EditText) view.findViewById(R.id.nova_telefone);
@@ -93,6 +111,10 @@ public class Nova_OcorrenciaFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+                //escoder teclado
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+
                 getFragmentManager().popBackStack();
             }
         });
@@ -101,10 +123,12 @@ public class Nova_OcorrenciaFragment extends Fragment {
         salvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            Endereco endereco = new Endereco();
 
-            endereco.setEndereco(rua.getText() + "," + bairro.getText());
-            endereco.setTitulo(titulo.getText().toString());
+            novaOcorrencia();
+
+            //escoder teclado
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
 
             getFragmentManager().popBackStack();
             }
@@ -190,6 +214,50 @@ public class Nova_OcorrenciaFragment extends Fragment {
 
             Log.i("NovaOcorrencia", e.toString());
         }
+    }
+
+    void novaOcorrencia(){
+
+        //implementa a interface Service e faz a requisição dos dados
+        Service service = Service.retrofit.create(Service.class);
+
+        //Call<Catalogos> requisicao = service.listaCatalogos();
+        Call<Ocorrencia> post = service.setOcorrencias(new Ocorrencia(
+                foto.getDrawable().toString(),
+                titulo.getText().toString(),
+                data,
+                bairro.getText().toString(),
+                rua.getText().toString(),
+                telefone.getText().toString(),
+                email.getText().toString(),
+                descricao.getText().toString()));
+
+        post.enqueue(new Callback<Ocorrencia>() {
+            @Override
+            public void onResponse(Call<Ocorrencia> call, Response<Ocorrencia> response) {
+
+                if(!response.isSuccessful()){
+
+                    Log.i("NOVA OCORRENCIA", "Codigo de Erro: " + response.code());
+
+                }else{
+
+                    Toast.makeText(getActivity(), "Criado Com sucesso", Toast.LENGTH_SHORT).show();
+
+                    //codigo acima deveria entrar aqui
+                    Log.i("NOVA OCORRENCIA", "Beleza ");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Ocorrencia> call, Throwable t) {
+
+                Log.i("NOVA OCORRENCIA", "Falha: " + t.getMessage());
+
+            }
+        });
+
     }
 
 

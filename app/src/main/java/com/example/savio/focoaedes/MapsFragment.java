@@ -8,13 +8,17 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
-import com.example.savio.focoaedes.model.Endereco;
+import com.example.savio.focoaedes.model.Ocorrencia;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -25,7 +29,6 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
 
 //---------------Variaveis globais------------------------------------------------------------------//
 
-    Endereco endereco;
     GoogleMap mMap;
     LocationManager locationManager;
     float zoom;
@@ -77,19 +80,35 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        endereco = new Endereco();
-
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
 
         //noinspection MissingPermission
         mMap.setMyLocationEnabled(true);
-        mMap.moveCamera(CameraUpdateFactory.zoomTo(14.f));
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(13.5f));
 
         //configurações do botões nativos da google
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
         try { geoLocaliza(); } catch (IOException e) { e.printStackTrace(); }
+
+        //chama a view personalizada para o marker
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker marker) { return null;}
+
+            @Override
+            public View getInfoContents(Marker marker) {
+
+                View markerview = getLayoutInflater(null).inflate(R.layout.marker_layout, null);
+
+                TextView markertitulo = (TextView) markerview.findViewById(R.id.marker_titulo);
+                markertitulo.setText(marker.getTitle());
+
+                return markerview;
+            }
+        });
 
     }
 
@@ -131,7 +150,7 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
 
         Geocoder geocoder = new Geocoder(getActivity());
 
-        List<Address> list = geocoder.getFromLocationName("Avenida José Malcher, 1963", 1);
+        List<Address> list = geocoder.getFromLocationName("Alameda Soares, São Brás", 1);
 
         Address add = list.get(0);
 
@@ -140,7 +159,12 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
 
         LatLng marca = new LatLng(lat,lng);
 
-        mMap.addMarker(new MarkerOptions().position(marca).title("Muito lixo no quintal"));
+        MarkerOptions options = new MarkerOptions()
+        .position(marca)
+        .title("Cerveja parada, olha a dengue!")
+        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_on_black_24dp)); //design do marker
+
+        mMap.addMarker(options);
 
     }
 
