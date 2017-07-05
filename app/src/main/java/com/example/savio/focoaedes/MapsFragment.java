@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.savio.focoaedes.base.Service;
 import com.example.savio.focoaedes.model.Ocorrencia;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,7 +23,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MapsFragment extends SupportMapFragment implements OnMapReadyCallback, GoogleMap.OnMapClickListener, LocationListener {
 
@@ -148,23 +154,73 @@ public class MapsFragment extends SupportMapFragment implements OnMapReadyCallba
 
     public void geoLocaliza() throws IOException {
 
-        Geocoder geocoder = new Geocoder(getActivity());
+        final Geocoder geocoder = new Geocoder(getActivity());
 
-        List<Address> list = geocoder.getFromLocationName("Alameda Soares, São Brás", 1);
+        final List<Ocorrencia> ocorrencia = new ArrayList<>();
 
-        Address add = list.get(0);
+        //implementa a interface Service e faz a requisição dos dados
+        Service service = Service.retrofit.create(Service.class);
 
-        double lat = add.getLatitude();
-        double lng = add.getLongitude();
+        //Call<Catalogos> requisicao = service.listaCatalogos();
+        Call<List<Ocorrencia>> requisicao = service.getOcorrencias();
 
-        LatLng marca = new LatLng(lat,lng);
+        //executar de forma assincrona
+        requisicao.enqueue(new Callback<List<Ocorrencia>>() {
 
-        MarkerOptions options = new MarkerOptions()
-        .position(marca)
-        .title("Cerveja parada, olha a dengue!")
-        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_on_black_24dp)); //design do marker
+            //metodos de respostas
+            @Override
+            public void onResponse(Call<List<Ocorrencia>> call, Response<List<Ocorrencia>> response) {
 
-        mMap.addMarker(options);
+                //condição se os dados foram capturados
+                if(!response.isSuccessful()){
+
+                    Log.i("LISTA", "Erro: " + "Erro: " + response.code());
+                }
+                else{
+                    //captura o objeto JSON e converte
+                    List<Ocorrencia> catalogo = response.body();
+
+                    for(Ocorrencia oco : catalogo){
+
+                        Log.i("LISTA", ""+oco.getId() );
+
+                        List<Address> list;
+
+                        try {
+
+                            list = geocoder.getFromLocationName(oco.getRua()+" "+oco.getBairro(), 1);
+
+                            Address add = list.get(0);
+
+                            double lat = add.getLatitude();
+                            double lng = add.getLongitude();
+
+                            LatLng marca = new LatLng(lat,lng);
+
+                            MarkerOptions options = new MarkerOptions()
+                                    .position(marca)
+                                    .title(oco.getTitulo())
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_on_black_24dp)); //design do marker
+
+                            mMap.addMarker(options);
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Ocorrencia>> call, Throwable t) {
+
+                Log.i("LISTA", "Falha: " + t.getMessage());
+            }
+
+        });
 
     }
 

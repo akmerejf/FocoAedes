@@ -33,6 +33,7 @@ import com.example.savio.focoaedes.model.Ocorrencia;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
