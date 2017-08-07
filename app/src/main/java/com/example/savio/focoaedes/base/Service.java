@@ -17,7 +17,7 @@ import retrofit2.http.Path;
 
 public interface Service {
 
-    public static final String base_url = "http://104.236.7.68/api/v1/";
+    public static final String base_url = "http://104.236.7.68:8080/api/v1/";
 
     Gson gson = new GsonBuilder().setLenient().create();
 

@@ -1,8 +1,12 @@
 package com.example.savio.focoaedes;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -76,23 +80,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
+
+
         fab_mapa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //cor do icone
-                fab_mapa.setColorFilter(getColor(R.color.branquinho));
-                fab_lista.setColorFilter(getColor(R.color.pretinho));
+                //Permissão para acessar sua localização
+                if (ActivityCompat.checkSelfPermission(v.getContext(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                //cor do fundo
-                fab_mapa.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.pretinho)));
-                fab_lista.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.branquinho)));
+                    ActivityCompat.requestPermissions(MainActivity.this,
+                            new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
-                //Inicia Fragment do mapa
-                mostrarFragmentSemPilha(new MapsFragment(), "MapsFragment");
+                }
+                else{
 
-                fab_lista.setClickable(true);
-                fab_mapa.setClickable(false);
+                    //cor do icone
+                    fab_mapa.setColorFilter(getColor(R.color.branquinho));
+                    fab_lista.setColorFilter(getColor(R.color.pretinho));
+
+                    //cor do fundo
+                    fab_mapa.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.pretinho)));
+                    fab_lista.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.branquinho)));
+
+                    //Inicia Fragment do mapa
+                    mostrarFragmentSemPilha(new MapsFragment(), "MapsFragment");
+
+                    fab_lista.setClickable(true);
+                    fab_mapa.setClickable(false);
+                }
+
+
             }
         });
 
@@ -140,9 +161,20 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Inicia Fragment do mapa
-        alterarFragment(new MapsFragment(), "MapsFragment");
+        alterarFragment(new Lista_OcorrenciasFragment(), "ListaOcorrencias");
+        //cor do icone
+        fab_lista.setColorFilter(getColor(R.color.branquinho));
+        fab_mapa.setColorFilter(getColor(R.color.pretinho));
 
-        fab_mapa.setClickable(false);
+        //cor do fundo
+        fab_lista.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.pretinho)));
+        fab_mapa.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.branquinho)));
+
+        //Inicia Fragment da lista
+        mostrarFragmentSemPilha(new Lista_OcorrenciasFragment(), "ListaFragment");
+
+        fab_lista.setClickable(false);
+        fab_mapa.setClickable(true);
 
     }
 
@@ -199,6 +231,38 @@ public class MainActivity extends AppCompatActivity {
         fab_lista.setClickable(false);
         fab_mapa.setClickable(false);
         aberto = false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            //cor do icone
+            fab_mapa.setColorFilter(getColor(R.color.branquinho));
+            fab_lista.setColorFilter(getColor(R.color.pretinho));
+
+            //cor do fundo
+            fab_mapa.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.pretinho)));
+            fab_lista.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.branquinho)));
+
+            //Inicia Fragment do mapa
+            mostrarFragmentSemPilha(new MapsFragment(), "MapsFragment");
+
+            fab_lista.setClickable(true);
+            fab_mapa.setClickable(false);
+
+        } else{
+
+            Toast.makeText(MainActivity.this, "Permita acessar Maps para visualizar", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void switchContent(int id, Fragment fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(id, fragment, fragment.toString());
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
 //--------------Fim de codigo-----------------------------------------------------------------------//

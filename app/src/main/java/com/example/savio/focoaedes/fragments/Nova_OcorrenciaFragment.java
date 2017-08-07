@@ -8,11 +8,14 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +33,8 @@ import com.example.savio.focoaedes.base.Service;
 import com.example.savio.focoaedes.mascaras.MaskTelefone;
 import com.example.savio.focoaedes.model.Ocorrencia;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,7 +51,7 @@ public class Nova_OcorrenciaFragment extends Fragment {
     View view;
     EditText titulo, bairro, rua, telefone, email, descricao;
     TextView salvar;
-    ImageView cancelar, foto;
+    ImageView cancelar, fotoBitmap;
     Toolbar toolbar;
     private final int CAMERA_REQUEST = 1888;
     final int   CROP_PIC = 2;
@@ -54,6 +59,9 @@ public class Nova_OcorrenciaFragment extends Fragment {
 
     SimpleDateFormat formato;
     String data = "";
+    private byte[] foto;
+    private String encodedImage;
+    private File file;
 
     public Nova_OcorrenciaFragment() { /*Required empty public constructor*/ }
 
@@ -69,7 +77,7 @@ public class Nova_OcorrenciaFragment extends Fragment {
         cancelar = (ImageView) view.findViewById(R.id.nova_cancelar);
         salvar = (TextView) view.findViewById(R.id.nova_salvar);
 
-        foto = (ImageView) view.findViewById(R.id.nova_foto);
+        fotoBitmap = (ImageView) view.findViewById(R.id.nova_foto);
         titulo = (EditText) view.findViewById(R.id.nova_titulo);
         data = formato.format(new Date());
         bairro = (EditText) view.findViewById(R.id.nova_bairro);
@@ -94,7 +102,7 @@ public class Nova_OcorrenciaFragment extends Fragment {
 
 
         //clique no icone com a camerazinha ativa a camera do celular
-        foto.setOnClickListener(new View.OnClickListener() {
+        fotoBitmap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -183,16 +191,25 @@ public class Nova_OcorrenciaFragment extends Fragment {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
 
             //captura a imagem tirada da camera
-            pic_uri = data.getData();
+             file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new Date().getTime() + ".png");
+            pic_uri = Uri.fromFile(file);
+            Bitmap photo = data.getExtras().getParcelable("data");
+            fotoBitmap.setImageBitmap(photo);
 
-            cortarFoto();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            photo.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+            foto = baos.toByteArray();
+            encodedImage = Base64.encodeToString(foto, Base64.DEFAULT);
+
+
+
         }
         //se o cortador de foto for ativado
-        else if (requestCode == CROP_PIC) {
+        else if (requestCode == Integer.valueOf(CROP_PIC)) {
             Bundle extras = data.getExtras();
             Bitmap photo = extras.getParcelable("data");
 
-            foto.setImageBitmap(photo);
+
         }
     }
 
@@ -202,7 +219,12 @@ public class Nova_OcorrenciaFragment extends Fragment {
         try {
 
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            cropIntent.setDataAndType(pic_uri, "image/*");
+            Uri apkURI = FileProvider.getUriForFile(
+                    getContext(),
+                    getContext().getApplicationContext()
+                            .getPackageName() + ".provider", file);
+            cropIntent.setDataAndType(apkURI, "json");
+            cropIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             cropIntent.putExtra("crop", "true");
             cropIntent.putExtra("aspectX", 1);
             cropIntent.putExtra("aspectY", 1);
@@ -212,7 +234,7 @@ public class Nova_OcorrenciaFragment extends Fragment {
             startActivityForResult(cropIntent, CROP_PIC);
         }
         catch (ActivityNotFoundException e) {
-
+            Log.i("wtf",e.toString());
             Log.i("NovaOcorrencia", e.toString());
         }
     }
@@ -224,7 +246,7 @@ public class Nova_OcorrenciaFragment extends Fragment {
 
         //Call<Catalogos> requisicao = service.listaCatalogos();
         Call<Ocorrencia> post = service.setOcorrencias(new Ocorrencia(
-                foto.getDrawable().toString(),
+                encodedImage,
                 titulo.getText().toString(),
                 data,
                 bairro.getText().toString(),

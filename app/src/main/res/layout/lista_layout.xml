@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cardview="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -10,64 +10,92 @@
     android:paddingLeft="16dp"
     android:background="@color/branquinho">
 
-    <ImageView
-        android:id="@+id/lista_foto"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentLeft="true"
-        android:src="@color/amarromzado"/>
-
-    <TextView
-        android:id="@+id/lista_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"/>
-
-    <TextView
-        android:id="@+id/lista_titulo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chiko Cunha Atacada Minha"
-        android:textSize="18dp"
-        android:textColor="@color/pretinho"
-        android:textStyle="bold"
-        android:ems="9"
-        android:maxLines="1"
-        android:layout_marginLeft="15dp"
-        android:layout_marginBottom="5dp"
-        android:layout_toRightOf="@+id/lista_foto" />
-
-    <TextView
-        android:id="@+id/lista_data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:text="11/12/2017"
-        android:textColor="@color/pretinho"
-        android:textSize="14dp"
-        android:maxLength="10"
-        android:maxLines="1"/>
-
-    <TextView
-        android:id="@+id/lista_endereco"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Almirante Barroso, 22 - Marco"
-        android:textColor="@color/pretinho"
-        android:textSize="14dp"
-        android:ems="18"
-        android:maxLines="1"
-        android:layout_marginLeft="15dp"
-        android:layout_below="@+id/lista_titulo"
-        android:layout_toRightOf="@+id/lista_foto" />
-
-    <View
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height=".5dp"
-        android:layout_marginTop="16dp"
-        android:layout_below="@+id/lista_foto"
-        android:background="@android:color/darker_gray"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/lista_container">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/lista_titulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chiko Cunha Atacada Minha"
+                android:textSize="18dp"
+                android:textColor="@color/pretinho"
+                android:textStyle="bold"
+                android:ems="9"
+                android:maxLines="1"
+                android:layout_marginLeft="15dp"
+                android:layout_marginBottom="5dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"/>
+
+
+            <ImageView
+                android:id="@+id/lista_foto"
+                android:layout_width="fill_parent"
+                android:layout_height="150dp"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentTop="false"
+                android:scaleType="centerCrop"
+                android:layout_below="@id/lista_titulo"/>
+
+            <TextView
+                android:id="@+id/lista_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/lista_endereco"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Almirante Barroso, 22 - Marco"
+                android:textColor="@color/pretinho"
+                android:textSize="14dp"
+                android:ems="18"
+                android:maxLines="2"
+                android:layout_marginLeft="15dp"
+                android:background="@color/vermelhudo"
+                android:layout_below="@+id/lista_foto"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="-16dp"
+
+                />
+
+            <TextView
+                android:id="@+id/lista_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+
+                android:text="11/12/2017"
+                android:textColor="@color/pretinho"
+                android:textSize="14dp"
+                android:maxLength="10"
+                android:layout_gravity="left"
+                android:maxLines="1"/>
+
+
+            <TextView
+                android:id="@+id/lista_descricao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lorem ipsum dolor sit amet,consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam"
+                android:textColor="@color/pretinho"
+                android:textSize="14dp"
+                android:ems="18"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/lista_foto"
+                />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>
 
 

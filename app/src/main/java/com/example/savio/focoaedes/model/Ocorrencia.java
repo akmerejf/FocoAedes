@@ -1,8 +1,11 @@
 package com.example.savio.focoaedes.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 @SuppressWarnings("ALL")
-public class Ocorrencia {
+public class Ocorrencia implements Parcelable {
 
 
     String id, caminho_foto, titulo, data, bairro, endereco, telefone, email, descricao;
@@ -103,4 +106,13 @@ public class Ocorrencia {
         this.descricao = descricao;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+    }
 }
